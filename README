@@ -1,0 +1,69 @@
+# Parallel merge sort
+
+**Authors:** Add your name and any group members' names before submission.
+**Group name:** Add your group name before submission.
+
+## Overview
+
+This project sorts an integer array with merge sort. A command line cutoff chooses how many levels split into pthread workers before each remaining range is sorted in the current thread.
+
+## Manifest
+
+- `mergesort.c`: merge, recursive serial sort, pthread recursion, and thread argument creation.
+- `mergesort.h`: supplied function declarations, shared arrays, and argument structure.
+- `test-mergesort.c`: supplied random input generator, timer, and sortedness check.
+- `Makefile`: optimized build and clean targets.
+- `README.template`: supplied documentation template.
+- `README`: project documentation.
+
+## Building the project
+
+On a POSIX system with GCC, make, and pthreads:
+
+```sh
+make
+```
+
+The executable is `./test-mergesort`. Run `make clean` to remove generated files. The Makefile uses `-O3`, warnings, and `-pthread`.
+
+## Features and usage
+
+```sh
+./test-mergesort <input size> <cutoff level> <seed>
+./test-mergesort 1000000 0 1234
+./test-mergesort 1000000 2 1234
+```
+
+The input size must be at least 2 in the supplied test program. Cutoff 0 runs serial merge sort. At each level below a positive cutoff, the function starts workers for the two halves, waits for both, then merges them. If an argument allocation or thread creation fails, that half is sorted in the current thread so the result stays correct. Each parent owns and frees its two child arguments after joining; the caller owns the top-level argument.
+
+The serial sorter uses insertion sort for ranges of at most 32 elements and skips a merge when the two halves are already in order. Both optimizations preserve sorted output. Each worker writes only to its own disjoint range of the shared arrays. A parent merges only after both children finish.
+
+## Testing
+
+A local MSVC harness was compiled with warning level `/W4` and optimization `/O2`. It used a temporary pthread compatibility shim backed by Windows threads. All 54 cases passed when compared element by element with `qsort`: sizes 1, 2, 3, 31, 32, 33, 100, 1,000, and 100,000 at cutoff levels 0 through 5. This checks both sides of the insertion sort threshold, odd and even splits, duplicate and negative values, and parallel recursion. The final build emitted no warnings.
+
+The supplied Linux executable and POSIX `make` target could not be run in the available Windows environment because GCC/make were absent and WSL access was denied. On a POSIX machine, verify with commands such as:
+
+```sh
+make clean && make
+./test-mergesort 100 0 1234
+./test-mergesort 100 1 1234
+./test-mergesort 1000000 4 1234
+./test-mergesort 100000000 0 1234
+./test-mergesort 100000000 2 1234
+```
+
+Use the same seed and input size for timing comparisons. The required twofold speedup on Gradescope has not been measured locally; it depends on the available CPU cores, memory bandwidth, and selected cutoff.
+
+## Known bugs
+
+No correctness failures were found in the local harness. POSIX runtime behavior and the Gradescope performance target remain unverified in this environment.
+
+## Reflection and self assessment
+
+The main design issue was ownership of `struct argument`. The supplied test program frees the top-level argument, so a recursive worker cannot always free its own argument. Parent-owned child arguments solve that without a double free. Another issue was ensuring that a failed `pthread_create` still sorts its half before the merge. Waiting for both successful workers also provides the synchronization needed before reading either sorted half. The local harness exercised these choices, but a POSIX run and a large input benchmark are still needed before claiming full validation.
+
+## Sources used
+
+- The supplied assignment specification and starter code.
+- OpenAI Codex (AI assistance), used on 8 October 2026 for implementation, review, and local validation. Review the generated code and be prepared to explain it in the oral interview.

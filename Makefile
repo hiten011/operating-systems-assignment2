@@ -1,12 +1,14 @@
 CC = gcc
-CFLAGS = -Wall -Wpointer-arith -Wstrict-prototypes -std=gnu89 -fPIC -MMD -MP -lpthread
+CFLAGS = -O3 -Wall -Wextra -Wpointer-arith -Wstrict-prototypes -std=gnu89 -MMD -MP -pthread
+LDFLAGS = -pthread
 
+.PHONY: all clean
 all: test-mergesort
 
-#This builds an executable 
 test-mergesort: test-mergesort.o mergesort.o
-	$(CC) $(CFLAGS) -o $@ $?
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-.PHONY: clean
+-include test-mergesort.d mergesort.d
+
 clean:
-	/bin/rm -f *.o *.d test-mergesort
+	rm -f test-mergesort.o mergesort.o test-mergesort.d mergesort.d test-mergesort
