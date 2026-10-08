@@ -9,7 +9,7 @@
 
 /* this function will be called by mergesort() and also by parallel_mergesort(). */
 void merge(int leftstart, int leftend, int rightstart, int rightend){
-	int idx = leftstart, st = leftstart, len = rightend - leftstart + 1;
+	int idx = leftstart, st = leftstart;
 
 	while (leftstart <= leftend && rightstart <= rightend) {
 		if (A[leftstart] < A[rightstart]) {
@@ -19,10 +19,14 @@ void merge(int leftstart, int leftend, int rightstart, int rightend){
 		}
 	}
 
-	while (leftstart <= leftend) 	B[idx++] = A[leftstart++];
-	while (rightstart <= rightend) 	B[idx++] = A[rightstart++];
+    if (leftstart <= leftend) {
+        int n = leftend - leftstart + 1;
+        memcpy(&B[idx], &A[leftstart], sizeof(int) * n);
+        idx += n;
+    }
 
-	memcpy(&A[st], &B[st], sizeof(int) * len);
+    // copy B to A
+    memcpy(&A[st], &B[st], sizeof(int) * (idx - st));
 }
 
 /* this function will be called by parallel_mergesort() as its base case. */
