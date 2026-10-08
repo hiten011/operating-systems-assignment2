@@ -40,7 +40,24 @@ void my_mergesort(int left, int right){
 /* this function will be called by the testing program. */
 void * parallel_mergesort(void *arg){
 	struct argument *a = arg;
-	my_mergesort(a->left, a->right);
+   	int l = a->left, r = a->right, level = a->level;
+	free(a);
+
+	if (level >= cutoff) {my_mergesort(l, r); return NULL;}
+
+	// call with threads
+	int mid = l + (r - l) / 2;
+	pthread_t t1, t2;
+
+	pthread_create(&t1, NULL, parallel_mergesort, buildArgs(l, mid, level + 1));
+	pthread_create(&t2, NULL, parallel_mergesort, buildArgs(mid + 1, r, level + 1));
+
+	pthread_join(t1, NULL);
+	pthread_join(t2, NULL);
+
+
+	// merge the two sorted arrays into one
+	merge(l, mid, mid + 1, r);
 	return NULL;
 }
 
