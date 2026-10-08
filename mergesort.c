@@ -31,7 +31,21 @@ void merge(int leftstart, int leftend, int rightstart, int rightend){
 
 /* this function will be called by parallel_mergesort() as its base case. */
 void my_mergesort(int left, int right){
-	if (left >= right) return;
+	if (right - left <= SMALL) {
+		// insertion sort
+		int st = left;
+		while (++st <= right) {
+			int idx = st - 1, key = A[st];
+			while (idx >= left && key < A[idx]) {
+				A[idx + 1] = A[idx];
+				idx--;
+			}
+			
+			A[idx + 1] = key;
+		}
+
+		return;
+	}
 
 	int mid = left + (right - left) / 2;
 	my_mergesort(left, mid); 

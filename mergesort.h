@@ -3,6 +3,8 @@
 
 #include <pthread.h>
 
+#define SMALL 50 // value it switches merge sort to normalSort
+
 // function prototypes
 void my_mergesort(int left, int right);
 void merge(int leftstart, int leftend, int rightstart, int rightend);
