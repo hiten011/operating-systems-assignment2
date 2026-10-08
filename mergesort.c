@@ -43,7 +43,7 @@ void * parallel_mergesort(void *arg){
    	int l = a->left, r = a->right, level = a->level;
 	free(a);
 
-	if (level >= cutoff) {my_mergesort(l, r); return NULL;}
+	if (level >= cutoff || l >= r) {my_mergesort(l, r); return NULL;}
 
 	// call with threads
 	int mid = l + (r - l) / 2;
