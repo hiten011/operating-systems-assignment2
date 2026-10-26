@@ -1,0 +1,188 @@
+README
+
+## Project Number/Title 
+
+* Authors: Your Name, and your group members’ names
+* Group name: Your Group Name
+
+## Overview
+
+This program implements parallel merge sort algorithm in C using POSIX threads. It divides an array of randomly generated integers into smaller subarrays, sorts them concurrently using multiple threads, and merges the results into a single sorted array. The program also supports sequential execution to compare the performance of single-threaded and multi-threaded sorting.
+
+## Manifest
+
+1. mergesort.c: Implements recursive sequential merge sort, parallel merge sort, merging of sorted sub arrays, Threads creation and synchronization. 
+
+2. mergesort.h: Contains function declarations, global variable declarations, and the structure used to pass arguments to threads.
+
+3. test-mergesort.c: Generates random arrays, executes the sorting algorithm, measures execution time, and verifies whether the array is correctly sorted.
+
+4. Makefile: Contains compilation instructions for building the program into executable.
+
+5. README: Contains information about program, delivered files information, instructions to compile and run the program, testing information, and development reflection.
+
+## Building the project
+
+The program is developed for a Linux environment using the GCC compiler and POSIX threads.
+
+1. Requirements:
+
+    GCC compiler
+    GNU Make
+    POSIX threads (pthread)
+
+    Linux or Windows Subsystem for Linux (WSL)
+
+2. To compile the program, navigate to the project directory and execute:
+
+    make clean
+    make
+
+    This compiles the source files and generates the test-mergesort executable.
+
+3. To run the program:
+
+    ./test-mergesort <input_size> <cutoff_level> <seed>
+    Example:
+
+    ./test-mergesort 1000000 4 1234
+
+    This generates and sorts an array containing one million randomly generated integers using a cutoff level of four.
+
+## Features and usage
+
+1. Sequential Merge Sort
+
+The my_mergesort() function implements recursive merge sort. It divides the array into two halves until each subarray contains at most one element. The sorted subarrays are then combined using the merge() function.
+
+2. Parallel Merge Sort
+
+The parallel_mergesort() function creates child threads using pthread_create(). Each child is responsible for sorting a separate half of the array. Thread creation continues until the specified cutoff level is reached, after which sequential merge sort is used.
+
+3. Thread synchronization
+
+The program uses pthread_join() to ensure that both child threads finish sorting before the parent merges their results. Each thread operates on a separate section of the array, preventing overlapping writes during concurrent sorting.
+
+4. Thread Creation Failure Handling
+
+The program checks whether thread creation succeeds. If a thread cannot be created, the corresponding subarray is sorted sequentially instead.
+
+5. Memory Management
+
+Memory is dynamically allocated for thread arguments and the arrays used during sorting. The program checks whether allocation of thread arguments succeeds and releases them when they are no longer needed.
+
+6. Sorting Verification
+
+The testing program checks whether the final array is sorted in nondecreasing order and reports the execution time.
+
+The program accepts three command-line parameters:
+
+    input_size: Number of integers to generate and sort.
+    cutoff_level: Recursion level at which the program stops creating new threads.
+    seed: Random seed used to generate reproducible inputs.
+
+Setting the cutoff level to 0 executes sequential merge sort without creating additional threads.
+    
+## Testing
+
+Testing is focused on sorting correctness, different input sizes, cutoff levels, and parallel performance. The testing program generates random integers using a fixed seed and checks whether the resulting array is correctly sorted.
+
+Correctness Testing
+
+The following commands can be used to test the implementation:
+
+    ./test-mergesort 100000000 0 1234
+    ./test-mergesort 100000000 1 1234
+    ./test-mergesort 100000000 2 1234
+    ./test-mergesort 100000000 3 1234
+    ./test-mergesort 100000000 4 1234
+    ./test-mergesort 100000000 5 1234
+    ./test-mergesort 100000000 6 1234
+    ./test-mergesort 100000000 7 1234
+    ./test-mergesort 100000000 8 1234
+
+The correctness of the sorted array is verified by check_if_sorted(), which compares consecutive elements.
+
+Performance Testing
+
+Performance was evaluated by comparing sequential and parallel execution using an input size of 100,000,000 elements.
+
+### Performance Testing – 100,000,000 Elements
+
+| Cutoff Level | Execution Time (seconds) | Speedup |
+| ------------ | ------------------------ | ------- |
+| 0            | 11.59                    | 1.00×   |
+| 1            | 6.47                     | 1.79×   |
+| 2            | 4.20                     | 2.76×   |
+| 3            | 3.08                     | 3.76×   |
+| 4            | 3.29                     | 3.52×   |
+| 5            | 2.96                     | 3.92×   |
+| 6            | 3.06                     | 3.79×   |
+| 7            | 3.01                     | 3.85×   |
+| 8            | 2.98                     | 3.89×   |
+
+Speedup = Sequential execution time / Parallel execution time
+
+Performance Summary: The fastest execution was at cutoff level 5, taking 2.96 seconds and achieving approximately 3.92× speedup compared with sequential merge sort. 
+
+These results demonstrate the benefits of parallel sorting and show that increasing the number of threads does not always produce better performance.
+
+## Known Bugs
+
+All issues are fixed. However, following are few limitations:
+
+1. Creating too many threads can introduce additional overhead and reduce performance.
+2. Execution time varies depending on the system's CPU, available cores, and background processes.
+3. The implementation does not fully handle unexpected pthread_join() failures.
+4. The testing program's debugging print functions assume arrays contain at least 100 elements.
+5. Additional testing is required to confirm that no other issues remain in the final implementation.
+
+## Reflection and Self Assessment
+Development Challenges
+
+1. Understanding the recursive Merge sort
+
+One of the main challenges was understanding how recursive merge sort could be implemented using multiple threads. Unlike sequential recursion, the parallel implementation creates child threads to sort different sections of the array independently.An important part of the program development was the understanding of the relationship between recursive function calls, creation of threads and synchronization.
+
+2. Thread Synchronization
+
+One of the key factors to consider was the fact that the parent thread should not combine the two subarrays before the two child threads were sorted.pthread_join() resolved this problem by blocking the parent thread until it received results from its child threads before it merged.
+
+3. Memory Management
+
+Another challenge was managing dynamically allocated thread arguments.The implementation was improved by adding memory-allocation checks, handling failed thread creation, and ensuring that argument structures were released appropriately. Understanding which part of the program was responsible for freeing allocated memory was particularly important.
+
+4. Performance Analysis
+
+Testing different cutoff levels showed that parallel execution can significantly improve performance compared with sequential sorting. However, increasing the number of threads does not always reduce execution time because thread creation, scheduling, and synchronization introduce overhead. This helped demonstrate the importance of balancing parallelism against the cost of managing additional threads.
+
+5. Key Learning Outcomes
+
+Through this project, we developed a better understanding of:
+
+    POSIX thread creation using pthread_create().
+    Thread synchronization using pthread_join().
+    Avoiding race conditions through independent subarray processing.
+    Dynamic memory allocation and deallocation.
+    Performance benchmake cleaning and speedup analysis.
+
+6. Self Assessment
+
+The project successfully implements recursive merge sort using POSIX threads to enable parallel execution. The implementation incorporates thread synchronization, memory management, error handling, and sequential fallback mechanisms to maintain correctness and reliability. Performance testing demonstrated a significant improvement over sequential execution, achieving a speedup greater than the required 2× threshold in earlier benchmarks. Overall, the project strengthened our understanding of concurrent programming, thread management, and performance optimisation. Further testing of the final implementation will confirm its correctness and performance.
+
+## Sources Used
+
+    COMP2002 Operating Systems Assignment Specification and Starter Code.
+    University-provided instructions, source files, and testing framework.
+
+    Operating Systems: Three Easy Pieces — Remzi H. Arpaci-Dusseau and Andrea C. Arpaci-Dusseau.
+    Used to understand threads, concurrency, and thread APIs.
+    https://pages.cs.wisc.edu/~remzi/OSTEP/
+
+    POSIX Threads Documentation.
+    Reference material for pthread_create() and pthread_join().
+
+    OpenAI ChatGPT (GPT-6), October 2026.
+    Used for explaining recursive merge sort, reviewing C code, understanding thread synchronization, discussing error handling, and assisting with README documentation. 
+
+The group reviewed and remains responsible for understanding, testing, and validating the submitted work.
