@@ -101,7 +101,7 @@ The correctness of the sorted array is verified by check_if_sorted(), which comp
 
 Performance Testing
 
-Performance was evaluated by comparing sequential and parallel execution using an input size of 100,000,000 elements.
+Performance was evaluated by comparing sequential and parallel execution using an input size of 100,000,000 elements. The table below represents the mean value of 4 similar executions.
 
 ### Performance Testing – 100,000,000 Elements
 
