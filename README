@@ -59,15 +59,11 @@ The my_mergesort() function implements recursive merge sort. It divides the arra
 
 The parallel_mergesort() function creates child threads using pthread_create(). Each child is responsible for sorting a separate half of the array. Thread creation continues until the specified cutoff level is reached, after which sequential merge sort is used.
 
-3. Thread synchronization
+3. Thread creation and synchronization
 
-The program uses pthread_join() to ensure that both child threads finish sorting before the parent merges their results. Each thread operates on a separate section of the array, preventing overlapping writes during concurrent sorting.
+The program checks whether thread creation succeeds. If a thread cannot be created, the corresponding subarray is sorted sequentially instead. It uses pthread_join() to ensure that both child threads finish sorting before the parent merges their results. Each thread operates on a separate section of the array, preventing overlapping writes during concurrent sorting.
 
-4. Thread Creation Failure Handling
-
-The program checks whether thread creation succeeds. If a thread cannot be created, the corresponding subarray is sorted sequentially instead.
-
-5. Memory Management
+4. Memory Management
 
 Memory is dynamically allocated for thread arguments and the arrays used during sorting. The program checks whether allocation of thread arguments succeeds and releases them when they are no longer needed.
 
