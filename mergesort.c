@@ -102,15 +102,18 @@ void * parallel_mergesort(void *arg){
 	}
 
 	// RIGHT CHILD
-	struct argument *rightChild = buildArgs(mid + 1, r, level + 1);
+	// skip thread for 1 element for right child
+	if (mid+1 < r) {
+		struct argument *rightChild = buildArgs(mid + 1, r, level + 1);
 
-	if (rightChild != NULL) {
-		int rc = pthread_create(&t2,NULL,parallel_mergesort,rightChild);
+		if (rightChild != NULL) {
+			int rc = pthread_create(&t2,NULL,parallel_mergesort,rightChild);
 
-		if (rc == 0) {
-			rightChildCreated = 1;
-		} else {
-			free(rightChild);
+			if (rc == 0) {
+				rightChildCreated = 1;
+			} else {
+				free(rightChild);
+			}
 		}
 	}
 
