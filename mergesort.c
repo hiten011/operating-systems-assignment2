@@ -56,6 +56,12 @@ void my_mergesort(int left, int right) {
 
 /* This function will be called by the testing program. */
 void * parallel_mergesort(void *arg){
+
+	// check incase buildArgs() maloc failed and passed null
+	if (arg == NULL) {
+		return NULL;
+	}
+
 	struct argument *a = arg;
    	int l = a->left, r = a->right, level = a->level;
 	if (level > 0) {
