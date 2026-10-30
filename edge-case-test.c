@@ -3,11 +3,12 @@
 #include <string.h>
 #include "mergesort.h"
 
-// globals need for mergesort.c
+// globals needed for mergesort.c
 int cutoff;
 int *A;
 int *B;
 
+// compares 2 int for qsort()
 static int cmp_int(const void *a, const void *b) {
 
     int ia = *(const int *)a;
@@ -24,6 +25,7 @@ static int cmp_int(const void *a, const void *b) {
     }
 }
 
+// checks if array is sorted from smallest to largest
 static int is_sorted(const int *arr, int n) {
 
     for (int i=0; i<n-1; i++) {
@@ -35,6 +37,9 @@ static int is_sorted(const int *arr, int n) {
     return 1;
 }
 
+// checks if array still has all the og values
+// also catches cases where values are lost or duplicates
+// it sorts copies of both arrays and compares them
 static int is_permutation(const int *arr, const int *og, int n) {
     int *a_sorted = malloc(sizeof(int) * n);
     int *o_sorted = malloc(sizeof(int) * n);
@@ -57,19 +62,27 @@ static int is_permutation(const int *arr, const int *og, int n) {
     return ok;
 }
 
+// runs 1 test and checks the sorting result
 static int run_case(const char *name, const int *input, int n, int test_cutoff) {
+
+    // save a copy of the og array
     int *og = malloc(sizeof(int) * n);
     memcpy(og, input, sizeof(int) * n);
 
+    // allocate mem for arrays used by mergesort
     A = malloc(sizeof(int) * n);
     B = malloc(sizeof(int) * n);
+
+    // copy the input into A and set cutoff
     memcpy(A, input, sizeof(int) * n);
     cutoff = test_cutoff;
 
+    // create arguments and start sorting
     struct argument *arg = buildArgs(0, n - 1, 0);
     parallel_mergesort(arg);
     free(arg);
 
+    // check if result is sorted and still has all og values
     int sorted_ok = is_sorted(A, n);
     int perm_ok = is_permutation(A, og, n);
     int pass = sorted_ok && perm_ok;
@@ -77,6 +90,8 @@ static int run_case(const char *name, const int *input, int n, int test_cutoff) 
     if (pass) {
         printf("PASS  %-28s (n=%2d, cutoff=%d)\n", name, n, test_cutoff);
     } else {
+
+        // show which check failed
         printf("FAIL %s (n=%d, cutoff=%d)\n", name, n, test_cutoff);
 
         if (sorted_ok== 1) {
@@ -91,6 +106,7 @@ static int run_case(const char *name, const int *input, int n, int test_cutoff) 
         }
     }
 
+    // free the memory used by thid
     free(A);
     free(B);
     free(og);
@@ -100,24 +116,31 @@ static int run_case(const char *name, const int *input, int n, int test_cutoff) 
 int main(void) {
     printf("edge cases tests for parallel_mergesort()\n");
 
+    // array sorted in reverse order
     int reverse[] = {8, 7, 6, 5, 4, 3, 2, 1};
     run_case("reverse sorted", reverse, 8, 2);
 
+    // array is already sorted
     int sorted[] = {1, 2, 3, 4, 5, 6, 7, 8};
     run_case("already sorted", sorted, 8, 2);
 
+    // includes negative numbers, zero and duplicate values
     int mixed[] = {4, -2, 5, -9, 0, -2, 7, -9, 5};
     run_case("duplicate and -ve", mixed, 9, 3);
 
+    // test an empty array, n=0
     int empty[1] = {0};
     run_case("empty array", empty, 0, 2);
 
+    // test an array with only 1 element
     int single[] = {53};
     run_case("single element", single, 1, 2);
 
+    // the right half contains smaller values than left half
     int swapped[] = {5, 6, 7, 8, 1, 2, 3, 4};
     run_case("halves swapped", swapped, 8, 2);
 
+    // values from both halves alternate during merging
     int intertwined[] = {1, 3, 5, 7, 9, 11, 2, 4, 6, 8, 10};
     run_case("intertwines halves, odd", intertwined, 11, 2);
     return 0;
