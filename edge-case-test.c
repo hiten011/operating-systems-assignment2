@@ -117,5 +117,8 @@ int main(void) {
 
     int swapped[] = {5, 6, 7, 8, 1, 2, 3, 4};
     run_case("halves swapped", swapped, 8, 2);
+
+    int intertwined[] = {1, 3, 5, 7, 9, 11, 2, 4, 6, 8, 10};
+    run_case("intertwines halves, odd", intertwined, 11, 2);
     return 0;
 }
