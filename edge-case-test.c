@@ -100,5 +100,8 @@ static int run_case(const char *name, const int *input, int n, int test_cutoff) 
 int main(void) {
     printf("edge cases tests for parallel_mergesort()\n");
 
+    int reverse[] = {8, 7, 6, 5, 4, 3, 2, 1};
+    run_case("reverse sorted", reverse, 8, 2);
+
     return 0;
 }
