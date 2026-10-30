@@ -19,6 +19,8 @@ This program implements parallel merge sort algorithm in C using POSIX threads. 
 
 4. Makefile: Contains compilation instructions for building the program into executable.
 
+5. edge-case-test.c: Separate test that sorts small edge case arrays (reverse sorted, duplicates, negatives, empty, single element etc) and checks that result is both sorted and a permutation of the input (not built by makefile)
+
 5. README: Contains information about program, delivered files information, instructions to compile and run the program, testing information, and development reflection.
 
 ## Building the project
@@ -98,6 +100,25 @@ The following commands can be used to test the implementation:
     ./test-mergesort 100000000 8 1234
 
 The correctness of the sorted array is verified by check_if_sorted(), which compares consecutive elements.
+
+Edge Case Testing
+
+The randomn array tests above never produce small, structured or negative inputs and check_if_sorted() only confirms that the output is in order not that it still contains the same elements. To cover this, edge-case-test.c sorts small arrays using the real buildArgs() and parallel_mergesort(), then checks two things: the result is sorted (is_sorted) and the result is a permutation of the input (is_permutation, which compares sorted copies of both arrays, so a dropped or duplicated element is caught).
+
+It is not part of the Makefile. To build and run use:
+
+    gcc -Wall -o edge-case-test edge-case-test.c mergesort.c
+    ./edge-case-test
+
+- reverse sorted: {8,7,6,5,4,3,2,1}, cutoff 2: every element out of place
+- already sorted: {1,2,3,4,5,6,7,8}, cutoff 2: nothing should move
+- duplicate and -ve: {4,-2,5,-9,0,-2,7,-9,5}, cutoff 3: repeats, negatives, odd length, single-element subarrays
+- empty array: n = 0, cutoff 2: must not crash (provided harness rejects n <= 1)
+- single element: {53}, cutoff 2: smallest non empty input
+- halves swapped: {5,6,7,8,1,2,3,4}, cutoff 2: left half all larger than right, so merge() copies leftover left elements
+- intertwined halves, odd: {1,3,5,7,9,11,2,4,6,8,10}, cutoff 2: merge() alternates sides, with uneven halves (6 & 5)
+
+Each case prints PASS or FAIL and on failure reports whether sorted check,permutation check or both failed. All cases passed.
 
 Performance Testing
 
