@@ -106,5 +106,8 @@ int main(void) {
     int sorted[] = {1, 2, 3, 4, 5, 6, 7, 8};
     run_case("already sorted", sorted, 8, 2);
 
+    int mixed[] = {4, -2, 5, -9, 0, -2, 7, -9, 5};
+    run_case("duplicate and -ve", mixed, 9, 3);
+
     return 0;
 }
