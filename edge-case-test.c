@@ -109,11 +109,13 @@ int main(void) {
     int mixed[] = {4, -2, 5, -9, 0, -2, 7, -9, 5};
     run_case("duplicate and -ve", mixed, 9, 3);
 
-        int empty[1] = {0};
+    int empty[1] = {0};
     run_case("empty array", empty, 0, 2);
 
     int single[] = {53};
     run_case("single element", single, 1, 2);
 
+    int swapped[] = {5, 6, 7, 8, 1, 2, 3, 4};
+    run_case("halves swapped", swapped, 8, 2);
     return 0;
 }
