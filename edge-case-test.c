@@ -57,6 +57,46 @@ static int is_permutation(const int *arr, const int *og, int n) {
     return ok;
 }
 
+static int run_case(const char *name, const int *input, int n, int test_cutoff) {
+    int *og = malloc(sizeof(int) * n);
+    memcpy(og, input, sizeof(int) * n);
+
+    A = malloc(sizeof(int) * n);
+    B = malloc(sizeof(int) * n);
+    memcpy(A, input, sizeof(int) * n);
+    cutoff = test_cutoff;
+
+    struct argument *arg = buildArgs(0, n - 1, 0);
+    parallel_mergesort(arg);
+    free(arg);
+
+    int sorted_ok = is_sorted(A, n);
+    int perm_ok = is_permutation(A, og, n);
+    int pass = sorted_ok && perm_ok;
+
+    if (pass) {
+        printf("PASS  %-28s (n=%2d, cutoff=%d)\n", name, n, test_cutoff);
+    } else {
+        printf("FAIL %s (n=%d, cutoff=%d)\n", name, n, test_cutoff);
+
+        if (sorted_ok== 1) {
+            printf("Sorted: yes\n");
+        } else {
+            printf("Sorted: no\n");
+        }
+        if (perm_ok == 1) {
+            printf("Permutation: yes\n");
+        } else {
+            printf("Permutation: no\n");
+        }
+    }
+
+    free(A);
+    free(B);
+    free(og);
+    return pass;
+}
+
 int main(void) {
     printf("edge cases tests for parallel_mergesort()\n");
 
